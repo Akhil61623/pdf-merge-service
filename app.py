@@ -1,68 +1,47 @@
-import os
-from flask import Flask, request, render_template, send_file, jsonify, redirect, url_for
-from werkzeug.utils import secure_filename
-from PyPDF2 import PdfMerger
-import razorpay
-import tempfile
-import time
+from flask import Flask, request, send_file, jsonify
+from pypdf import PdfMerger
+import io
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = tempfile.gettempdir()
 
-# Razorpay setup
-razorpay_client = razorpay.Client(auth=(
-    os.environ.get("RAZORPAY_KEY_ID", ""),
-    os.environ.get("RAZORPAY_KEY_SECRET", "")
-))
+@app.route("/")
+def home():
+    return "PDF Merge Service Running 🚀"
 
-@app.route('/')
-def index():
-    return render_template("index.html")
+@app.route("/merge", methods=["POST"])
+def merge_pdf():
+    try:
+        # अगर files नहीं मिलीं तो error
+        if "files" not in request.files:
+            return jsonify({"error": "No PDF files uploaded"}), 400
 
-@app.route('/merge', methods=['POST'])
-def merge_pdfs():
-    files = request.files.getlist("pdfs")
-    if not files or len(files) == 0:
-        return "कृपया PDFs चुनें", 400
+        files = request.files.getlist("files")
 
-    # Size check
-    total_size = sum(len(f.read()) for f in files)
-    for f in files: f.seek(0)
+        if len(files) < 2:
+            return jsonify({"error": "Please upload at least 2 PDF files"}), 400
 
-    # Rules
-    if len(files) <= 80 and total_size <= 25 * 1024 * 1024:
-        # Free merge → redirect to waiting page
-        return render_template("waiting.html", files=len(files))
-    else:
-        # Razorpay payment required
-        order = razorpay_client.order.create({
-            "amount": 1000,   # ₹10
-            "currency": "INR",
-            "payment_capture": 1
-        })
-        return jsonify({"error": "payment_required", "order_id": order["id"], "amount": 1000})
+        merger = PdfMerger()
 
-@app.route('/process_merge', methods=['POST'])
-def process_merge():
-    files = request.files.getlist("pdfs")
-    merger = PdfMerger()
-    out_path = os.path.join(app.config['UPLOAD_FOLDER'], "merged.pdf")
+        # हर file को merger में जोड़ो
+        for pdf in files:
+            merger.append(pdf)
 
-    for f in files:
-        filename = secure_filename(f.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        f.save(file_path)
-        merger.append(file_path)
+        # Output को memory में save करो
+        output = io.BytesIO()
+        merger.write(output)
+        merger.close()
+        output.seek(0)
 
-    merger.write(out_path)
-    merger.close()
+        return send_file(
+            output,
+            as_attachment=True,
+            download_name="merged.pdf",
+            mimetype="application/pdf"
+        )
 
-    time.sleep(2)  # waiting effect
-    return send_file(out_path, as_attachment=True, download_name="merged.pdf")
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-@app.route("/healthz")
-def health():
-    return "OK", 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
