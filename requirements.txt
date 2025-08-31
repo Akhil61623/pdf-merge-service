@@ -1,5 +1,5 @@
 Flask==2.3.3
 gunicorn==23.0.0
-pypdf==6.0.0
+PyPDF2==2.12.1   # pypdf की जगह
 razorpay==1.4.2
 setuptools>=68.0.0
