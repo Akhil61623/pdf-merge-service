@@ -30,7 +30,7 @@ function handleFiles(files) {
 }
 
 mergeButton.addEventListener('click', async () => {
-  if (!selectedFiles.length) return alert('कृपया PDF फाइलें चुनें');
+  if (!selectedFiles.length) return alert('Please select PDF files');
 
   const formData = new FormData();
   selectedFiles.forEach(f => formData.append('files', f));
@@ -51,7 +51,7 @@ mergeButton.addEventListener('click', async () => {
       a.remove();
     } else {
       const err = await response.json();
-      alert(err.error || 'कुछ गड़बड़ हुई');
+      alert(err.error || 'Something went wrong');
     }
   } catch (err) {
     alert('Server error: ' + err.message);
