@@ -1,15 +1,15 @@
 from flask import Flask, request, send_file, jsonify
-from pypdf import PdfMerger   # 👈 यह लाइन ऊपर imports में
+from pypdf import PdfReader, PdfWriter
 import io
 
 app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "PDF Merge Service Running 🚀"
+    return "🚀 PDF Merge Service is running"
 
 @app.route("/merge", methods=["POST"])
-def merge_pdf():
+def merge_pdfs():
     try:
         if "files" not in request.files:
             return jsonify({"error": "No PDF files uploaded"}), 400
@@ -19,14 +19,18 @@ def merge_pdf():
         if len(files) < 2:
             return jsonify({"error": "Please upload at least 2 PDF files"}), 400
 
-        merger = PdfMerger()
+        writer = PdfWriter()
 
+        # हर PDF को पढ़कर add करना
         for pdf in files:
-            merger.append(pdf)
+            reader = PdfReader(pdf)
+            for page in reader.pages:
+                writer.add_page(page)
 
+        # Output को memory में save करना
         output = io.BytesIO()
-        merger.write(output)
-        merger.close()
+        writer.write(output)
+        writer.close()
         output.seek(0)
 
         return send_file(
