@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, request, send_file, render_template, jsonify
 from pypdf import PdfReader, PdfWriter
 import io
 
@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "🚀 PDF Merge Service is running"
+    return render_template("index.html")
 
 @app.route("/merge", methods=["POST"])
 def merge_pdfs():
@@ -21,7 +21,7 @@ def merge_pdfs():
 
         writer = PdfWriter()
 
-        # हर PDF को पढ़कर add करना
+        # हर PDF को पढ़कर जोड़ना
         for pdf in files:
             reader = PdfReader(pdf)
             for page in reader.pages:
