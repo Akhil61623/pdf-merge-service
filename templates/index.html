@@ -1,87 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <title>PDF Merger with Payment</title>
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <style>
-    body { font-family: Arial; text-align: center; margin-top: 50px; }
-    .loader {
-      display: none;
-      border: 8px solid #f3f3f3;
-      border-top: 8px solid #3498db;
-      border-radius: 50%;
-      width: 60px; height: 60px;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-    @keyframes spin { 100% { transform: rotate(360deg); } }
-  </style>
+  <title>महामाया स्टेशनरी — PDF Merge Service</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h2>🚀 PDF Merge Service</h2>
-  <form id="uploadForm" action="/merge" method="post" enctype="multipart/form-data">
-    <p>Select PDFs to merge:</p>
-    <input type="file" name="files" multiple required accept="application/pdf"><br><br>
-    <button type="submit">Merge PDFs</button>
-  </form>
+  <header>महामाया स्टेशनरी</header>
 
-  <div class="loader" id="loader"></div>
+  <div class="container">
+    <div class="dropzone" id="dropzone">
+      <p>यहाँ क्लिक करें या PDF फाइलें drag & drop करें</p>
+      <input type="file" id="fileInput" name="files" accept="application/pdf" multiple>
+    </div>
+    <button id="mergeButton">Merge and Download</button>
+    <div class="loader" id="loader"></div>
+  </div>
 
-  <script>
-    const form = document.getElementById("uploadForm");
-    const loader = document.getElementById("loader");
-
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
-      loader.style.display = "block";
-
-      const formData = new FormData(form);
-      const response = await fetch("/merge", { method: "POST", body: formData });
-
-      if (response.status === 402) {
-        loader.style.display = "none";
-        const data = await response.json();
-        alert(data.message);
-
-        // Create Razorpay order
-        const orderRes = await fetch("/create-order", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: 10 })
-        });
-        const order = await orderRes.json();
-
-        const options = {
-          key: "{{ razorpay_key }}",
-          amount: order.amount,
-          currency: "INR",
-          name: "PDF Merger",
-          description: "Charge for extra usage",
-          order_id: order.id,
-          handler: function (response) {
-            alert("Payment successful! Please upload again.");
-          }
-        };
-
-        const rzp1 = new Razorpay(options);
-        rzp1.open();
-      } else if (response.ok) {
-        loader.style.display = "none";
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "merged.pdf";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      } else {
-        loader.style.display = "none";
-        const err = await response.json();
-        alert("Error: " + err.error);
-      }
-    });
-  </script>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
