@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>महामाया स्टेशनरी — PDF Merge Service</title>
+  <title>Mahāmāyā Stationery — PDF Merge Service</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header>महामाया स्टेशनरी</header>
+  <header>Mahāmāyā Stationery</header>
 
   <div class="container">
     <div class="dropzone" id="dropzone">
-      <p>यहाँ क्लिक करें या PDF फाइलें drag & drop करें</p>
+      <p>Click or Drag & Drop your PDF files here</p>
       <input type="file" id="fileInput" name="files" accept="application/pdf" multiple>
     </div>
-    <button id="mergeButton">Merge and Download</button>
+    <button id="mergeButton">Merge PDFs</button>
     <div class="loader" id="loader"></div>
   </div>
 
