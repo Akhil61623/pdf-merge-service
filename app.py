@@ -1,5 +1,5 @@
 from flask import Flask, request, send_file, jsonify
-from pypdf import PdfMerger
+from pypdf import PdfMerger   # 👈 यह लाइन ऊपर imports में
 import io
 
 app = Flask(__name__)
@@ -11,7 +11,6 @@ def home():
 @app.route("/merge", methods=["POST"])
 def merge_pdf():
     try:
-        # अगर files नहीं मिलीं तो error
         if "files" not in request.files:
             return jsonify({"error": "No PDF files uploaded"}), 400
 
@@ -22,11 +21,9 @@ def merge_pdf():
 
         merger = PdfMerger()
 
-        # हर file को merger में जोड़ो
         for pdf in files:
             merger.append(pdf)
 
-        # Output को memory में save करो
         output = io.BytesIO()
         merger.write(output)
         merger.close()
