@@ -61,3 +61,5 @@ mergeButton.addEventListener('click', async () => {
   mergeButton.disabled = false;
 });
 let response = await fetch('/merge', { method: 'POST', body: formData });
+const err = await response.json();
+alert(err.error || 'Something went wrong');
