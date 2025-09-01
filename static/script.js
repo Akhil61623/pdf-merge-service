@@ -60,3 +60,4 @@ mergeButton.addEventListener('click', async () => {
   loader.style.display = 'none';
   mergeButton.disabled = false;
 });
+let response = await fetch('/merge', { method: 'POST', body: formData });
