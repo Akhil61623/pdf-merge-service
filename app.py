@@ -1,111 +1,31 @@
-from flask import Flask, request, send_file, render_template, jsonify
-from pypdf import PdfReader, PdfWriter
-from PIL import Image
-import io, os, zipfile
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return render_template("index.html")
-
-# 1. PDF Merge
-@app.route("/merge", methods=["POST"])
-def merge_pdfs():
-    files = request.files.getlist("files")
-    writer = PdfWriter()
-    for pdf in files:
-        reader = PdfReader(pdf)
-        for page in reader.pages:
-            writer.add_page(page)
-    output = io.BytesIO()
-    writer.write(output)
-    output.seek(0)
-    return send_file(output, as_attachment=True, download_name="merged.pdf")
-
-# 2. PDF Split
-@app.route("/split", methods=["POST"])
-def split_pdf():
-    file = request.files["file"]
-    reader = PdfReader(file)
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w") as zipf:
-        for i, page in enumerate(reader.pages):
-            writer = PdfWriter()
-            writer.add_page(page)
-            page_bytes = io.BytesIO()
-            writer.write(page_bytes)
-            page_bytes.seek(0)
-            zipf.writestr(f"page_{i+1}.pdf", page_bytes.read())
-    zip_buffer.seek(0)
-    return send_file(zip_buffer, as_attachment=True, download_name="split_pages.zip")
-
-# 3. PDF Compress (simple: remove metadata, optimize content)
-@app.route("/compress", methods=["POST"])
-def compress_pdf():
-    file = request.files["file"]
-    reader = PdfReader(file)
-    writer = PdfWriter()
-    for page in reader.pages:
-        writer.add_page(page)
-    output = io.BytesIO()
-    writer.write(output)
-    output.seek(0)
-    return send_file(output, as_attachment=True, download_name="compressed.pdf")
-
-# 4. Image to PDF
-@app.route("/img2pdf", methods=["POST"])
-def img_to_pdf():
-    files = request.files.getlist("images")
-    img_list = []
-    for img in files:
-        image = Image.open(img).convert("RGB")
-        img_list.append(image)
-    output = io.BytesIO()
-    img_list[0].save(output, save_all=True, append_images=img_list[1:], format="PDF")
-    output.seek(0)
-    return send_file(output, as_attachment=True, download_name="images.pdf")
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
-import subprocess, tempfile
-
-@app.route("/merge", methods=["POST"])
-def merge_pdfs():
-    files = request.files.getlist("files")
-    if len(files) < 2:
-        return jsonify({"error": "Need at least 2 PDFs"}), 400
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        paths = []
-        for i, f in enumerate(files):
-            path = os.path.join(tmpdir, f"file{i}.pdf")
-            f.save(path)
-            paths.append(path)
-
-        output_path = os.path.join(tmpdir, "merged.pdf")
-        cmd = ["qpdf", "--empty", "--pages"] + paths + ["--", output_path]
-        subprocess.run(cmd, check=True)
-
-        return send_file(output_path, as_attachment=True, download_name="merged.pdf")
-from tqdm import tqdm
 import time
+from tqdm import tqdm
 
+# Dummy function to simulate file compression
 def compress_file(input_file, target_size_mb):
-    print("Compressing file...")
+    print(f"\nCompressing {input_file} to ~{target_size_mb} MB...\n")
+    for _ in tqdm(range(100), desc="Compressing", ncols=100):
+        time.sleep(0.03)  # simulate processing
+    print(f"✅ File compressed successfully to {target_size_mb} MB\n")
 
-    # प्रोग्रेस ऐनिमेशन
-    for i in tqdm(range(100), desc="Processing", ncols=100):
-        time.sleep(0.05)  # simulation
-
-    # Logic: फाइल को target_size_mb में कंप्रेस करो
-    print(f"File compressed to ~{target_size_mb} MB")
-
+# Dummy function to simulate file splitting
 def split_file(input_file, part_size_mb):
-    print("Splitting file...")
+    print(f"\nSplitting {input_file} into parts of {part_size_mb} MB...\n")
+    for _ in tqdm(range(100), desc="Splitting", ncols=100):
+        time.sleep(0.02)  # simulate processing
+    print(f"✅ File split into chunks of {part_size_mb} MB each\n")
 
-    for i in tqdm(range(100), desc="Splitting", ncols=100):
-        time.sleep(0.03)
+# Main program
+if __name__ == "__main__":
+    print("==== File Compressor & Splitter ====")
+    file_name = input("Enter your file name (e.g., example.pdf): ")
 
-    # Logic: part_size_mb के हिसाब से फाइल को तोड़ो
-    print(f"File split into parts of {part_size_mb} MB each")
+    # Compression target
+    target_size = int(input("Enter target size in MB (e.g., 70): "))
+    compress_file(file_name, target_size)
+
+    # Splitting size
+    part_size = int(input("Enter part size in MB for splitting (e.g., 20): "))
+    split_file(file_name, part_size)
+
+    print("🎉 All operations completed successfully!")
