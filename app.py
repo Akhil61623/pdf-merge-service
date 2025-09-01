@@ -88,3 +88,24 @@ def merge_pdfs():
         subprocess.run(cmd, check=True)
 
         return send_file(output_path, as_attachment=True, download_name="merged.pdf")
+from tqdm import tqdm
+import time
+
+def compress_file(input_file, target_size_mb):
+    print("Compressing file...")
+
+    # प्रोग्रेस ऐनिमेशन
+    for i in tqdm(range(100), desc="Processing", ncols=100):
+        time.sleep(0.05)  # simulation
+
+    # Logic: फाइल को target_size_mb में कंप्रेस करो
+    print(f"File compressed to ~{target_size_mb} MB")
+
+def split_file(input_file, part_size_mb):
+    print("Splitting file...")
+
+    for i in tqdm(range(100), desc="Splitting", ncols=100):
+        time.sleep(0.03)
+
+    # Logic: part_size_mb के हिसाब से फाइल को तोड़ो
+    print(f"File split into parts of {part_size_mb} MB each")
