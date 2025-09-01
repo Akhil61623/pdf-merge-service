@@ -1,68 +1,36 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #f9f9f9;
-  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
   text-align: center;
 }
-
 header {
-  background-color: #4a7c59;
+  background: #4a7c59;
   color: white;
-  padding: 20px 0;
-  font-size: 1.8rem;
-  font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 20px;
+  font-size: 1.5rem;
 }
-
 .container {
-  max-width: 600px;
-  margin: 40px auto;
+  width: 60%;
+  margin: 20px auto;
   background: white;
-  padding: 30px;
+  padding: 20px;
+  border-radius: 10px;
+}
+.tool {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
-.dropzone {
-  border: 2px dashed #4a7c59;
-  border-radius: 8px;
-  padding: 40px;
-  position: relative;
-  cursor: pointer;
-}
-
-.dropzone input {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
 button {
-  background-color: #4a7c59;
+  background: #4a7c59;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-size: 1rem;
+  padding: 10px 15px;
+  margin-top: 10px;
+  border-radius: 5px;
   cursor: pointer;
-  margin-top: 20px;
 }
-
 button:hover {
-  background-color: #3d6548;
+  background: #3b6149;
 }
-
-.loader {
-  display: none;
-  margin: 20px auto;
-  border: 8px solid #f3f3f3;
-  border-top: 8px solid #4a7c59;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin { 100% { transform: rotate(360deg); } }
