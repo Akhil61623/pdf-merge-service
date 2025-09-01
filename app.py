@@ -68,3 +68,23 @@ def img_to_pdf():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+import subprocess, tempfile
+
+@app.route("/merge", methods=["POST"])
+def merge_pdfs():
+    files = request.files.getlist("files")
+    if len(files) < 2:
+        return jsonify({"error": "Need at least 2 PDFs"}), 400
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        paths = []
+        for i, f in enumerate(files):
+            path = os.path.join(tmpdir, f"file{i}.pdf")
+            f.save(path)
+            paths.append(path)
+
+        output_path = os.path.join(tmpdir, "merged.pdf")
+        cmd = ["qpdf", "--empty", "--pages"] + paths + ["--", output_path]
+        subprocess.run(cmd, check=True)
+
+        return send_file(output_path, as_attachment=True, download_name="merged.pdf")
